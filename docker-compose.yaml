@@ -2,12 +2,19 @@ version: "3"
 
 services:
   keycloak:
-    build:
-      context: ./keycloak
+    image: quay.io/keycloak/keycloak:20.0.1
+    #build:
+      #context: ./keycloak
     ports:
       - 8080:8080
     networks:
       - demonet
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    volumes:
+      - "./keycloak/realm.json:/opt/keycloak/data/import/realm.json:ro"
+    command: ["start-dev", "--import-realm"]
 
   envoy:
     build:

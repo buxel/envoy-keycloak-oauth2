@@ -31,9 +31,9 @@ static_resources:
                       config:
                         token_endpoint:
                           cluster: keycloak
-                          uri: http://keycloak:8080/auth/realms/demorealm/protocol/openid-connect/token
+                          uri: http://keycloak:8080/realms/demorealm/protocol/openid-connect/token
                           timeout: 5s
-                        authorization_endpoint: http://localhost:8080/auth/realms/demorealm/protocol/openid-connect/auth
+                        authorization_endpoint: http://localhost:8080/realms/demorealm/protocol/openid-connect/auth
                         redirect_uri: "http://%REQ(:authority)%/oauth2/callback"
                         redirect_path_matcher:
                           path:
