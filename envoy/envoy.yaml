@@ -104,9 +104,3 @@ static_resources:
                     socket_address:
                       address: oidcapp
                       port_value: 9009
-admin:
-  access_log_path: "/tmp/envoy.log"
-  address:
-    socket_address:
-      address: 0.0.0.0
-      port_value: 9901
