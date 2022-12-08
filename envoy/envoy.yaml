@@ -20,9 +20,13 @@ static_resources:
                       domains: ["*"]
                       routes:
                         - match:
-                            prefix: "/"
+                            prefix: "/simpleapp"
                           route:
-                            cluster: upstream
+                            cluster: simpleapp
+                        - match:
+                            prefix: "/iodcapp"
+                          route:
+                            cluster: iodcapp
 
                 http_filters:
                   - name: envoy.filters.http.oauth2
@@ -73,16 +77,36 @@ static_resources:
                       address: keycloak
                       port_value: 8080
 
-    - name: upstream
+    - name: simpleapp
       connect_timeout: 1s
       type: STRICT_DNS
       lb_policy: ROUND_ROBIN
       load_assignment:
-        cluster_name: upstream
+        cluster_name: simpleapp
         endpoints:
           - lb_endpoints:
               - endpoint:
                   address:
                     socket_address:
-                      address: upstream
+                      address: simpleapp
                       port_value: 80
+
+    - name: oidcapp
+      connect_timeout: 1s
+      type: STRICT_DNS
+      lb_policy: ROUND_ROBIN
+      load_assignment:
+        cluster_name: oidcapp
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: oidcapp
+                      port_value: 9009
+admin:
+  access_log_path: "/tmp/envoy.log"
+  address:
+    socket_address:
+      address: 0.0.0.0
+      port_value: 9901

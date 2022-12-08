@@ -24,12 +24,7 @@ services:
     networks:
       - demonet
 
-  upstream:
-    image: nginx
-    networks:
-      - demonet
-
-  oidc-test-client:
+  oidcapp:
     image: beryju/oidc-test-client
     ports:
       - 9009:9009
@@ -37,6 +32,15 @@ services:
       OIDC_CLIENT_ID: oidc-tester
       OIDC_CLIENT_SECRET: 3nhYktR0LLTiPRD7Mit6331cC0h9DKgu
       OIDC_PROVIDER: http://keycloak:8080/realms/demorealm
+    networks:
+      - demonet
+    depends_on:
+      - keycloak
+
+  simpleapp:
+    image: nginx
+    ports:
+      - 9008:80
     networks:
       - demonet
 
