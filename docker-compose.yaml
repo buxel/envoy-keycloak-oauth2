@@ -14,28 +14,72 @@ services:
       - KEYCLOAK_ADMIN_PASSWORD=admin
     volumes:
       - "./keycloak/realm.json:/opt/keycloak/data/import/realm.json:ro"
-    command: [ "start-dev", "--import-realm" ]
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/auth/" ]
+      interval: 5s
+      timeout: 2s
+      retries: 15
+    command:
+      [
+        "start-dev",
+        "--import-realm",
+        "--proxy=edge",
+        "--hostname-strict=false"
+      ]
 
   envoy:
-    build:
-      context: ./envoy
+    image: envoyproxy/envoy:v1.24-latest
     ports:
       - 10000:10000
     networks:
       - demonet
+    volumes:
+      - ./envoy:/etc/envoy
+    command:
+      [
+        "/usr/local/bin/envoy",
+        "-c",
+        "/etc/envoy/envoy.yaml",
+        "--service-cluster",
+        "envoy",
+        "--service-node",
+        "envoy",
+        "--log-level",
+        "debug"
+      ]
 
   oidcapp:
-    image: beryju/oidc-test-client
+    image: minio/minio:RELEASE.2022-03-26T06-49-28Z.hotfix.6a78a92ad
     ports:
-      - 9009:9009
+      - 9000:9000
+      - 9001:9001
     environment:
-      OIDC_CLIENT_ID: oidc-tester
-      OIDC_CLIENT_SECRET: 3nhYktR0LLTiPRD7Mit6331cC0h9DKgu
-      OIDC_PROVIDER: http://keycloak:8080/realms/demorealm
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+      # MINIO_IDENTITY_OPENID_CONFIG_URL: http://keycloak:8080/auth/realms/demorealm/.well-known/openid-configuration
+      # MINIO_IDENTITY_OPENID_REDIRECT_URI: http://localhost:8080/oauth2/callback
+      # MINIO_IDENTITY_OPENID_CLIENT_ID: oidc-tester
+      # MINIO_IDENTITY_OPENID_CLIENT_SECRET: 3nhYktR0LLTiPRD7Mit6331cC0h9DKgu
     networks:
       - demonet
     depends_on:
       - keycloak
+    restart: "unless-stopped"
+    command: [ "server", "/tmp", "--console-address", ":9001" ]
+
+  # oidcapp:
+  #   image: beryju/oidc-test-client
+  #   ports:
+  #     - 9009:9009
+  #   environment:
+  #     OIDC_CLIENT_ID: oidc-tester
+  #     OIDC_CLIENT_SECRET: 3nhYktR0LLTiPRD7Mit6331cC0h9DKgu
+  #     OIDC_PROVIDER: http://envoy:8080/keycloak/realms/demorealm
+  #   networks:
+  #     - demonet
+  #   depends_on:
+  #     - keycloak
+  #   restart: "unless-stopped"
 
   simpleapp:
     image: nginx
