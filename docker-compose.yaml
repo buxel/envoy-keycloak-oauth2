@@ -56,10 +56,11 @@ services:
     environment:
       MINIO_ROOT_USER: minio
       MINIO_ROOT_PASSWORD: minio123
-      # MINIO_IDENTITY_OPENID_CONFIG_URL: http://keycloak:8080/auth/realms/demorealm/.well-known/openid-configuration
-      # MINIO_IDENTITY_OPENID_REDIRECT_URI: http://localhost:8080/oauth2/callback
-      # MINIO_IDENTITY_OPENID_CLIENT_ID: oidc-tester
-      # MINIO_IDENTITY_OPENID_CLIENT_SECRET: 3nhYktR0LLTiPRD7Mit6331cC0h9DKgu
+      MINIO_BROWSER_REDIRECT_URL: http://localhost:10000/oidcapp
+      MINIO_IDENTITY_OPENID_CONFIG_URL: http://keycloak:8080/realms/demorealm/.well-known/openid-configuration
+      MINIO_IDENTITY_OPENID_REDIRECT_URI: http://localhost:9001/oauth_callback
+      MINIO_IDENTITY_OPENID_CLIENT_ID: oidc-tester
+      MINIO_IDENTITY_OPENID_CLIENT_SECRET: 3nhYktR0LLTiPRD7Mit6331cC0h9DKgu
     networks:
       - demonet
     depends_on:
